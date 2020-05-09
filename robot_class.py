@@ -1,28 +1,9 @@
 from math import *
 import random
 
-
-### ------------------------------------- ###
-# Below, is the robot class
-#
-# This robot lives in 2D, x-y space, and its motion is
-# pointed in a random direction, initially.
-# It moves in a straight line until it comes close to a wall 
-# at which point it stops.
-#
-# For measurements, it  senses the x- and y-distance
-# to landmarks. This is different from range and bearing as
-# commonly studied in the literature, but this makes it much
-# easier to implement the essentials of SLAM without
-# cluttered math.
-#
 class robot:
     
-    # --------
-    # init:
-    #   creates a robot with the specified parameters and initializes
-    #   the location (self.x, self.y) to the center of the world
-    #
+
     def __init__(self, world_size = 100.0, measurement_range = 30.0,
                  motion_noise = 1.0, measurement_noise = 1.0):
         self.measurement_noise = 0.0
@@ -68,14 +49,7 @@ class robot:
     ## TODO: paste your complete the sense function, here
     ## make sure the indentation of the code is correct
     def sense(self):
-        ''' This function does not take in any parameters, instead it references internal variables
-            (such as self.landamrks) to measure the distance between the robot and any landmarks
-            that the robot can see (that are within its measurement range).
-            This function returns a list of landmark indices, and the measured distances (dx, dy)
-            between the robot's position and said landmarks.
-            This function should account for measurement_noise and measurement_range.
-            One item in the returned list should be in the form: [landmark_index, dx, dy].
-            '''
+        
            
         measurements = []
         
@@ -91,6 +65,27 @@ class robot:
         ##    as list.append([index, dx, dy]), this format is important for data creation done later
         
         ## TODO: return the final, complete list of measurements
+        dx, dy = 0, 0
+        
+        # iterate through all of the landmarks in a world
+        for index in range(self.num_landmarks):
+            
+            landmark_dx = self.landmarks[index][0]
+            landmark_dy = self.landmarks[index][1]
+            
+        # 1. compute dx and dy, the distances between the robot and the landmark
+            dx = landmark_dx - self.x
+            dy = landmark_dy - self.y
+        
+        # 2. account for measurement noise by *adding* a noise component to dx and dy
+            noise = self.rand() * self.motion_noise
+            dx, dy = dx + noise, dy + noise
+        
+        # 3. add to the measurements list if either of the distances dx or dy falls inside of measurement_range
+            if (dx < self.measurement_range) and (dy < self.measurement_range):
+                measurements.append([index, dx, dy])
+            
+        # return the final complete list of measurements
         return measurements
 
 
